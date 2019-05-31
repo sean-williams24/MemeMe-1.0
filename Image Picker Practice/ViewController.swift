@@ -14,12 +14,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var cameraButton: UIBarButtonItem!
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        subscribeToKeyboardNotifications()
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -44,6 +39,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        subscribeToKeyboardNotifications()
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         unsubscribeFromKeyboardNotifications()
@@ -51,7 +51,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     
-    //MARK: - Clear default text from both text fields when clicked
+    //MARK: - Clear default text from both text fields when clicked and hide keyboard
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if textField == topTextField && topTextField.text == "TOP" {
@@ -85,7 +85,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     
-    //MARK: - Move keyboard functions
+
+    //MARK: - Move view when keyboard appears on bottom text field
+    
     
     // - Make view controller subscribe to keyboard notifications
     func subscribeToKeyboardNotifications() {
@@ -96,10 +98,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // - Unsubscribe from keyboard notifications
     func unsubscribeFromKeyboardNotifications() {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
+    
     
     // - Move screen up
     @objc func keyboardWillShow(_ notifictation: Notification) {
+        
         view.frame.origin.y -= getKeyboardHeight(notifictation)
     }
     
@@ -114,6 +119,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let keyboardSize = userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! NSValue
         return keyboardSize.cgRectValue.height
     }
+
     
     
     
