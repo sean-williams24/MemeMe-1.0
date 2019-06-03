@@ -14,10 +14,24 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var cameraButton: UIBarButtonItem!
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
-
+    @IBOutlet weak var shareButton: UIBarButtonItem!
+    @IBOutlet weak var cancelButton: UIBarButtonItem!
+    
+    struct Meme {
+        var topText: String
+        var bottomText: String
+        let originalImage: UIImage
+        let memedImage: UIImage
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if imageView.image == nil {
+            shareButton.isEnabled = false
+            } else {
+            shareButton.isEnabled = true
+        }
         topTextField.delegate = self
         bottomTextField.delegate = self
         
@@ -36,6 +50,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
 
         // - Check to see if the device has a camera available
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
+        
+       
         
     }
     
@@ -109,11 +125,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     // - Make view controller subscribe to keyboard notifications
-    
     func subscribeToKeyboardNotifications() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
     }
     
     // - Unsubscribe from keyboard notifications
@@ -122,7 +136,25 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 
+    //MARK: - Genrate meme from view
     
+    func generateMemedImage() -> UIImage {
+        
+        //Render view to image
+        UIGraphicsBeginImageContext(self.view.frame.size)
+        view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
+        let memedImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        
+        return memedImage
+    }
+    
+    //MARK: - Initialize meme object
+    
+    func saveMeme() {
+        //Create the meme
+        _ = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: imageView.image!, memedImage: generateMemedImage())
+    }
     
     
     //MARK: - Pick image from photo album
@@ -133,6 +165,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
         present(imagePicker, animated: true, completion: nil)
+        shareButton.isEnabled = true
     }
 
     //MARK: - Open camera
@@ -143,11 +176,30 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         cameraPicker.delegate = self
         cameraPicker.sourceType = .camera
         present(cameraPicker, animated: true, completion: nil)
+        shareButton.isEnabled = true
     }
     
-    //MARK: - Initialize a Meme model object
+    //MARK: - Share meme function
     
-
+    @IBAction func shareMeme(_ sender: UIBarButtonItem) {
+        let memedImage = generateMemedImage()
+        let controller = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
+        present(controller, animated: true, completion: nil)
+        
+        // Send meme to activity controller
+        controller.completionWithItemsHandler = { (activity, success, items, error) in
+            if(success) {
+                self.saveMeme()
+                }
+            }
+        }
     
 }
 
+//        let text = "Test Text"
+//        let printData = UISimpleTextPrintFormatter(text: text)
+//        let vc = UIActivityViewController(activityItems: [text, printData], applicationActivities: nil)
+//        vc.completionWithItemsHandler = { (type,completed,items,error) in
+//            print("completed. type=\(type) completed=\(completed) items=\(items) error=\(error)")
+//        }
+//
