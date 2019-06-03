@@ -16,6 +16,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var bottomTextField: UITextField!
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
+    @IBOutlet weak var toolbar: UIToolbar!
     
     struct Meme {
         var topText: String
@@ -35,18 +36,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         topTextField.delegate = self
         bottomTextField.delegate = self
         
-        topTextField.text = "TOP"
-        bottomTextField.text = "BOTTOM"
-        let memeTextAttributes: [NSAttributedString.Key: Any] = [
-            NSAttributedString.Key.strokeColor: UIColor.black,
-            NSAttributedString.Key.foregroundColor: UIColor.white,
-            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
-            NSAttributedString.Key.strokeWidth: 0.5
-        ]
-        topTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.defaultTextAttributes = memeTextAttributes
-        topTextField.textAlignment = .center
-        bottomTextField.textAlignment = .center
+        resetScreen()
 
         // - Check to see if the device has a camera available
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
@@ -139,6 +129,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     //MARK: - Genrate meme from view
     
     func generateMemedImage() -> UIImage {
+        self.navigationController?.navigationBar.isHidden = true
+        self.toolbar.isHidden = true
         
         //Render view to image
         UIGraphicsBeginImageContext(self.view.frame.size)
@@ -146,6 +138,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let memedImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
+        self.navigationController?.navigationBar.isHidden = false
+        self.toolbar.isHidden = false
         return memedImage
     }
     
@@ -181,7 +175,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     //MARK: - Share meme function
     
-    @IBAction func shareMeme(_ sender: UIBarButtonItem) {
+    @IBAction func shareMeme(_ sender: Any) {
         let memedImage = generateMemedImage()
         let controller = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         present(controller, animated: true, completion: nil)
@@ -194,12 +188,28 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             }
         }
     
+    //MARK: - Reset screen
+    
+    @IBAction func cancelButton(_ sender: Any) {
+        resetScreen()
+    }
+    
+    func resetScreen() {
+        topTextField.text = "TOP"
+        bottomTextField.text = "BOTTOM"
+        let memeTextAttributes: [NSAttributedString.Key: Any] = [
+            NSAttributedString.Key.strokeColor: UIColor.black,
+            NSAttributedString.Key.foregroundColor: UIColor.white,
+            NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
+            NSAttributedString.Key.strokeWidth: 0.5
+        ]
+        topTextField.defaultTextAttributes = memeTextAttributes
+        bottomTextField.defaultTextAttributes = memeTextAttributes
+        topTextField.textAlignment = .center
+        bottomTextField.textAlignment = .center
+        imageView.image = nil
+    }
+    
+    
 }
 
-//        let text = "Test Text"
-//        let printData = UISimpleTextPrintFormatter(text: text)
-//        let vc = UIActivityViewController(activityItems: [text, printData], applicationActivities: nil)
-//        vc.completionWithItemsHandler = { (type,completed,items,error) in
-//            print("completed. type=\(type) completed=\(completed) items=\(items) error=\(error)")
-//        }
-//
