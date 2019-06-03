@@ -23,9 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Meme would like to access your camera fool</string>
+	<string>MeMe would like to access your camera.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Just Testing!</string>
+	<string>MeMe would like to access your photos.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
